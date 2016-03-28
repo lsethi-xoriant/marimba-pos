@@ -1,0 +1,30 @@
+<ion-view title="Cashout Requests">
+    <!-- header -->
+    <ion-header-bar align-title="center" class="bar-positive">
+        <h1 class="title">CASHOUT REQUESTS</h1>
+    </ion-header-bar>
+    <!-- content -->
+    <ion-content class="has-header">
+        <!-- No content alert -->
+        <div class="card"
+            ng-if="!pins || pins.length == 0">
+            <div class="item item-text-wrap">
+                <h2 style="text-align: center">NO CASHOUT REQUESTS</h2>
+            </div>
+        </div>
+        <!-- content list -->
+        <ul class="list">
+            <!-- pins requested cashout -->
+            <li class="item item-button-right"
+                ng-repeat="pin in pins">
+                <h2>{{pin.number | fixedDigit:6}}</h2>
+                <span>{{pin.credits | currency}}</span>
+                <button class="button button-positive"
+                        ng-click="cashout(pin.number)">
+                    <i class="icon ion-log-out"></i>
+                </button>
+            </li>
+        </ul>
+        <!-- end of list -->
+    </ion-content>
+</ion-view>

@@ -1,0 +1,10 @@
+{
+  "name": "pulltabs-pos",
+  "app_id": "",
+  "proxies": [
+    {
+        "path": "/api/pos",
+        "proxyUrl": "http://localhost:8000/api/pos"
+    }
+  ]
+}
