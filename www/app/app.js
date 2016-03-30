@@ -11,7 +11,7 @@ angular.module('pulltabs.pos', [
 
 // Routes
 .config(function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/shift');
+    $urlRouterProvider.otherwise('/login');
 
     $stateProvider
 

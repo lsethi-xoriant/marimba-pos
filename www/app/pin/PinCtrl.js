@@ -67,14 +67,15 @@
             PinService.getPins().then(
                 function(data) {
                     if(data) {
-                        $scope.pins = data;
-                        var pinCount = $scope.pins.filter(function(e){return e.status == 'new'}).length;
+                        $scope.activePins = data.filter(function(e){return e.status == 'active'});
+                        $scope.newPins = data.filter(function(e){return e.status == 'new'});
+                        var pinCount = $scope.newPins.length || 0;
                         $rootScope.pinCount = pinCount;
-                        console.log("Pin Count: " + $rootScope.pinCount);
                     }
                 },
                 function() {
-                    $scope.pins = null;
+                    $scope.newPins = null;
+                    $scope.activePins = null;
                 }
             );
         }
@@ -93,7 +94,7 @@
 
         function startWatch() {
             if(!$scope.watcher) {
-                $scope.watcher = $interval(30000, updatePins);
+                $scope.watcher = $interval(updatePins, 30000);
             }
         }
 
@@ -118,6 +119,8 @@
             $rootScope.$on("session:loggedOut", stopWatch);
             $rootScope.$on("pin:newPin", updatePins);
             $scope.$on("$destroy", stopWatch);
+
+            startWatch();
 
         }
 

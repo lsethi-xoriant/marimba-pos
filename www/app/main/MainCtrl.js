@@ -7,6 +7,7 @@
             // if not logged in, force login
             SessionService.assureLogged();
             PinService.getPins().then(function(data){
+                console.log(data);
                 $rootScope.pinCount = data.filter(function(e){return e.status == 'new'}).length;
                 $rootScope.cashOutRequestCount = data.filter(function(e){return e.status == 'cashout'}).length;
             });

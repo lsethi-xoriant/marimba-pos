@@ -1,11 +1,11 @@
 (function(){
-    function PinService(Request, SessionService, $q, $rootScope) {
+    function PinService(Request, SessionService, $q, $rootScope, $ionicLoading) {
         return {
             getPin: function(number) {
                 var deferred = $q.defer();
                 Request.get('/pin/'+number).then(
                     function(data) {
-                        deferred.resolve(data);
+                        deferred.resolve(data.data);
                     },
                     function(failure) {
                         deferred.reject(failure.data.error);
@@ -17,7 +17,7 @@
                 var deferred = $q.defer();
                 Request.get('/pin/location/'+SessionService.getLocation().id).then(
                     function(data) {
-                        deferred.resolve(data)
+                        deferred.resolve(data.data.objects)
                     },
                     function(failure) {
                         deferred.reject(failure.data.error);
@@ -27,11 +27,16 @@
             },
             deletePin: function(number) {
                 var deferred = $q.defer();
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="android"></ion-spinner>'
+                });
                 Request.del('/pin/'+number).then(
                     function(data) {
-                        deferred.resolve(data.message);
+                        $ionicLoading.hide();
+                        deferred.resolve(data.data.message);
                     },
                     function(failure) {
+                        $ionicLoading.hide();
                         deferred.reject(failure.data.error);
                     }
                 );
@@ -43,43 +48,59 @@
                     credits: value*100,
                     location: SessionService.getLocation().id
                 };
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="android"></ion-spinner>'
+                });
                 Request.post('/pin', pinData).then(
                     function(data) {
-                        deferred.resolve(data);
+                        $ionicLoading.hide();
+                        deferred.resolve(data.data);
                         $rootScope.$broadcast("pin:newPin");
                     },
                     function(failure) {
+                        $ionicLoading.hide();
                         deferred.reject(failure.data.error);
                     }
                 );
                 return deferred.promise;
             },
             forceCashOut: function(number) {
-                var pin = this._findPin(number),
-                    deferred = $q.defer();
-                if(pin && pin.status == "active") {
-                    pin.status = "cashout";
-                    $rootScope.$broadcast("pin:forcedCashout", pin);
-                    deferred.resolve(pin);
-                } else {
-                    deferred.reject("Cannot force cashout for non-active PINs!");
-                }
+                var deferred = $q.defer();
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="android"></ion-spinner>'
+                });
+                Request.get('/pin/cashout/'+number).then(
+                    function(result) {
+                        $ionicLoading.hide();
+                        $rootScope.$broadcast("pin:forcedCashout");
+                        deferred.resolve(result.data);
+                    },
+                    function(failure) {
+                        $ionicLoading.hide();
+                        deferred.reject(failure.data.error);
+                    }
+                );
                 return deferred.promise;
             },
             cashOutPin: function(number) {
-                var pin = this._findPin(number),
-                    deferred = $q.defer();
-                if(pin && pin.status == "cashout") {
-                    pin.status = "redeemed";
-                    deferred.resolve(pin);
-                } else {
-                    deferred.reject("Cannot confirm cashout for new, active or redeemed PINs!");
-                }
-
+                var deferred = $q.defer();
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="android"></ion-spinner>'
+                });
+                Request.get('/pin/cashout/'+number).then(
+                    function(result) {
+                        $ionicLoading.hide();
+                        deferred.resolve(result.data);
+                    },
+                    function(failure) {
+                        $ionicLoading.hide();
+                        deferred.reject(failure.data.error);
+                    }
+                );
                 return deferred.promise;
             }
         }
     }
 
-    angular.module('pulltabs.pos').factory('PinService', ['Request', 'SessionService', '$q', '$rootScope', PinService]);
+    angular.module('pulltabs.pos').factory('PinService', ['Request', 'SessionService', '$q', '$rootScope', '$ionicLoading', PinService]);
 })();

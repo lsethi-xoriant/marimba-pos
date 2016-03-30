@@ -1,23 +1,31 @@
 (function(module){
     'use strict';
 
-    function Request($http) {
-        var baseURL = 'http://localhost:8000/api/pos';
+    function Request($rootScope, $http, $ionicLoading) {
+        var baseURL = 'https://marimba-server.herokuapp.com/api/pos';
+
+        function __getToken() {
+            var token = "";
+            if ($rootScope.user) {
+                token = $rootScope.user.token || "";
+            }
+            return token
+        }
 
         function get(uri) {
-            return $http.get(baseURL+uri, {accepts: 'application/json'});
+            return $http.get(baseURL+uri+"?token="+__getToken(), {accepts: 'application/json'});
         }
 
         function post(uri, data) {
-            return $http.post(baseURL+uri, data, {contentType: 'application/json'});
+            return $http.post(baseURL+uri+"?token="+__getToken(), data, {contentType: 'application/json'});
         }
 
         function del(uri) {
-            return $http.delete(baseURL+uri);
+            return $http.delete(baseURL+uri+"?token="+__getToken());
         }
 
         function put(uri) {
-            return $http.put(baseURL+uri, data, {contentType: 'application/json'});
+            return $http.put(baseURL+uri+"?token="+__getToken(), data, {contentType: 'application/json'});
         }
 
         return {
@@ -28,5 +36,5 @@
         }
     }
 
-    module.service('Request', ['$http', Request]);
+    module.service('Request', ['$rootScope', '$http', '$ionicLoading',  Request]);
 })(angular.module('pulltabs.pos'));

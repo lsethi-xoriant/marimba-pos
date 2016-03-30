@@ -43,23 +43,23 @@
             PinService.getPins().then(
                 function(data) {
                     if(data && data.length) {
-                        $scope.pins = data.filter(function(e){
+                        $scope.cashOutPins = data.filter(function(e){
                             return e.status == "cashout";
                         });
-                        $rootScope.cashOutRequestCount = $scope.pins.length;
+                        console.log("Pins from Cashout: ", $scope.cashOutPins);
+                        $rootScope.cashOutRequestCount = $scope.cashOutPins.length;
                     }
                 },
                 function() {
-                    $scope.pins = null;
+                    $scope.cashOutPins = null;
+                    console.log("Could not gather cashout pins!");
                 }
             );
         }
 
         function startWatcher() {
             if(!$scope.cashoutWatcher) {
-                $scope.cashoutWatcher = $interval(function(){
-                    updatePins();
-                }, 30000);
+                $scope.cashoutWatcher = $interval(updatePins, 30000);
             }
             updatePins();
         }
